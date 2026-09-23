@@ -1,11 +1,11 @@
 ---
-name: RStudio Server
+name: Jupyter Notebook
 category: Interactive Apps
 subcategory: Servers
 role: batch_connect
 description: |
-  An app to launch <a href="https://rstudio.com" target="_blank">RStudio Server</a> on compute nodes<br>
+  An app to launch <a href="https://jupyter.org" target="_blank">Jupyter Notebook</a> on compute nodes<br>
 
-  &nbsp; Note: <a href="https://rocker-project.org/images" target="_blank">Rocker Project</a> container images are recommended for use<br>
+  &nbsp; Note: <a href="https://hub.docker.com/u/continuumio" target="_blank">Continuum</a> container images are recommended for use<br>
   &emsp; download images as follows:<br>
-  &emsp; $ singularity pull docker://rocker/rstudio:4.5.3<br>
+  &emsp; $ singularity pull docker://continuumio/anaconda3:latest<br>

@@ -1,22 +1,29 @@
-set -x
-
 # Find available port to run server on
-port=$(find_port ${host})
+port=$(find_port)
 
-# Create ~/.singularity as symlink to work.
-if [[ ! -e ~/.singularity ]]; then
-    mkdir -p ~/work/.singularity
-    ln -sr ~/work/.singularity ~/.singularity
-fi
+export JUPYTER_IMAGE=<%= context.singularity_image %>
 
-export RSTUDIO_SERVER_IMAGE=<%= context.singularity_image %>
-
-# Define a password and export it for RStudio authentication
+# Generate SHA1 encrypted password (requires OpenSSL installed)
+SALT="$(create_passwd 16)"
 password="$(create_passwd 16)"
-export RSTUDIO_PASSWORD="${password}"
+PASSWORD_SHA1="$(echo -n "${password}${SALT}" | openssl dgst -sha1 | awk '{print $NF}')"
 
-<%-
-  require 'securerandom'
-  csrftoken = SecureRandom.uuid
--%>
-export csrf_token="<%= csrftoken %>"
+# The `$CONFIG_FILE` environment variable is exported as it is used in the main
+# `script.sh.erb` file when launching the Jupyter Notebook server.
+export CONFIG_FILE="${PWD}/config.py"
+
+# Generate Jupyter configuration file with secure file permissions
+(
+umask 077
+cat > "${CONFIG_FILE}" << EOL
+c.NotebookApp.ip = '*'
+c.NotebookApp.port = ${port}
+c.NotebookApp.port_retries = 0
+c.NotebookApp.password = u'sha1:${SALT}:${PASSWORD_SHA1}'
+c.NotebookApp.base_url = '/node/${host}/${port}/'
+c.NotebookApp.open_browser = False
+c.NotebookApp.allow_origin = 'https://ondemand.biostat.washington.edu'
+c.NotebookApp.notebook_dir = '${HOME}'
+c.NotebookApp.disable_check_xsrf = True
+EOL
+)
