@@ -35,10 +35,8 @@ attributes:
     widget: select
     label: "Partition"
     value: "short-12c128g"
-    help: |
-      Partition to utilize
+    help: Partition to utilize
   auto_accounts:
     widget: select
     label: "Account"
-    help: |
-      Associated cluster account
+    help: Associated cluster account
